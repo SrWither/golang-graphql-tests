@@ -1,0 +1,25 @@
+type Post {
+  id: Int!
+  title:     String!
+  desc:      String!
+  content:   String!
+  createdAt: String!
+  updatedAt: String!
+  published: Boolean!
+}
+
+input PostInput {
+  title: String!
+  desc: String!
+  content: String!
+}
+
+type Query {
+  GetPosts: [Post]!
+  GetOnePost(id: Int!): Post
+}
+
+type Mutation {
+  createPost(input: PostInput): Post
+  updatePost(id: Int!, input: PostInput): Post
+}
