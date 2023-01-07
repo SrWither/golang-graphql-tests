@@ -41,11 +41,11 @@ type Query {
   GetPosts: [Post]!
   GetOnePost(id: Int!): Post
   user(id: ID!): User! @goField(forceResolver: true)
-  protected: String! @goField(forceResolver: true) @auth
+  # protected: String! @goField(forceResolver: true) @auth
 }
 
 type Mutation {
-  createPost(input: PostInput): Post
-  updatePost(id: Int!, input: PostInput): Post
+  createPost(input: PostInput): Post @auth
+  updatePost(id: Int!, input: PostInput): Post @auth
   auth: AuthOps! @goField(forceResolver: true)
 }

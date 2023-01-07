@@ -202,11 +202,6 @@ func (r *queryResolver) User(ctx context.Context, id string) (*model.User, error
 	return service.GetUserID(ctx, uid)
 }
 
-// Protected is the resolver for the protected field.
-func (r *queryResolver) Protected(ctx context.Context) (string, error) {
-	return "Success", nil
-}
-
 // AuthOps returns AuthOpsResolver implementation.
 func (r *Resolver) AuthOps() AuthOpsResolver { return &authOpsResolver{r} }
 
@@ -226,6 +221,10 @@ type queryResolver struct{ *Resolver }
 //   - When renaming or deleting a resolver the old code will be put in here. You can safely delete
 //     it when you're done.
 //   - You have helper methods in this file. Move them out to keep these resolver files clean.
+func (r *queryResolver) Protected(ctx context.Context) (string, error) {
+	return "Success", nil
+}
+
 type ErrMsg struct {
 	ErrMsg string `json:"errmsg"`
 }
