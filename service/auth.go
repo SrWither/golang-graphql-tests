@@ -23,34 +23,49 @@ func UserRegister(ctx context.Context, input model.NewUser) (interface{}, error)
 
 	createdUser, err := UserCreate(ctx, input)
 	if err != nil {
-		return nil, err
+		graphql.AddError(ctx, &gqlerror.Error{
+			Message: "Unable to create user",
+		})
+		return nil, nil
 	}
 
 	token, err := JwtGenerate(ctx, strconv.Itoa(createdUser.ID))
 	if err != nil {
-		return nil, err
+		graphql.AddError(ctx, &gqlerror.Error{
+			Message: "Error to generate token",
+		})
+		return nil, nil
 	}
 
 	return map[string]interface{}{
+		"user":  createdUser.Name,
+		"email": createdUser.Email,
 		"token": token,
 	}, nil
 }
 
 func UserLogin(ctx context.Context, email string, password string) (interface{}, error) {
 	getUser, err := GetUserEmail(ctx, email)
-	if err != nil {
+	if getUser == nil {
 		graphql.AddError(ctx, &gqlerror.Error{
-			Message: "User not found",
+			Message: "Wrong email",
 		})
+		return nil, nil
 	}
 
 	if err := tools.ComparePassword(getUser.Password, password); err != nil {
-		return nil, err
+		graphql.AddError(ctx, &gqlerror.Error{
+			Message: "Wrong password",
+		})
+		return nil, nil
 	}
 
 	token, err := JwtGenerate(ctx, strconv.Itoa(getUser.ID))
 	if err != nil {
-		return nil, err
+		graphql.AddError(ctx, &gqlerror.Error{
+			Message: "Error to generate token",
+		})
+		return nil, nil
 	}
 
 	return map[string]interface{}{
