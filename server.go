@@ -3,7 +3,9 @@ package main
 import (
 	"net/http"
 	"os"
+	"pruebas/directives"
 	"pruebas/graph"
+	"pruebas/middlewares"
 
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/playground"
@@ -21,16 +23,20 @@ func main() {
 	}
 
 	router := chi.NewRouter()
+	router.Use(middlewares.AuthMiddleware)
 
 	router.Use(cors.New(cors.Options{
-		AllowedOrigins:   []string{"http://192.168.60.188:8000"},
+		AllowedOrigins:   []string{"http://192.168.60.179:8000"},
 		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
 		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
 		AllowCredentials: true,
 		Debug:            true,
 	}).Handler)
 
-	srv := handler.NewDefaultServer(graph.NewExecutableSchema(graph.Config{Resolvers: &graph.Resolver{}}))
+	authc := graph.Config{Resolvers: &graph.Resolver{}}
+	authc.Directives.Auth = directives.Auth
+
+	srv := handler.NewDefaultServer(graph.NewExecutableSchema(authc))
 
 	router.Handle("/", playground.Handler("Starwars", "/query"))
 	router.Handle("/query", srv)

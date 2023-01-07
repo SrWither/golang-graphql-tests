@@ -2,6 +2,17 @@
 
 package model
 
+type AuthOps struct {
+	Login    interface{} `json:"login"`
+	Register interface{} `json:"register"`
+}
+
+type NewUser struct {
+	Name     string `json:"name"`
+	Email    string `json:"email"`
+	Password string `json:"password"`
+}
+
 type Post struct {
 	ID        int    `json:"id"`
 	Title     string `json:"title"`

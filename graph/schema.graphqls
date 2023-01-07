@@ -1,3 +1,9 @@
+directive @goField(forceResolver: Boolean, name: String) on FIELD_DEFINITION | INPUT_FIELD_DEFINITION
+
+directive @auth on FIELD_DEFINITION
+
+scalar Any
+
 type Post {
   id: Int!
   title:     String!
@@ -8,18 +14,38 @@ type Post {
   published: Boolean!
 }
 
+type User {
+  id: Int!
+  name: String!
+  email: String!
+}
+
 input PostInput {
   title: String!
   desc: String!
   content: String!
 }
 
+input NewUser {
+  name: String!
+  email: String!
+  password: String!
+}
+
+type AuthOps {
+  login(email: String!, password: String!): Any! @goField(forceResolver: true)
+  register(input: NewUser!): Any! @goField(forceResolver: true)
+}
+
 type Query {
   GetPosts: [Post]!
   GetOnePost(id: Int!): Post
+  user(id: ID!): User! @goField(forceResolver: true)
+  protected: String! @goField(forceResolver: true) @auth
 }
 
 type Mutation {
   createPost(input: PostInput): Post
   updatePost(id: Int!, input: PostInput): Post
+  auth: AuthOps! @goField(forceResolver: true)
 }

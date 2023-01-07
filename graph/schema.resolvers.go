@@ -10,10 +10,22 @@ import (
 	"fmt"
 	"pruebas/graph/model"
 	"pruebas/prisma/db"
+	"pruebas/service"
+	"strconv"
 
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/vektah/gqlparser/v2/gqlerror"
 )
+
+// Login is the resolver for the login field.
+func (r *authOpsResolver) Login(ctx context.Context, obj *model.AuthOps, email string, password string) (interface{}, error) {
+	return service.UserLogin(ctx, email, password)
+}
+
+// Register is the resolver for the register field.
+func (r *authOpsResolver) Register(ctx context.Context, obj *model.AuthOps, input model.NewUser) (interface{}, error) {
+	return service.UserRegister(ctx, input)
+}
 
 // CreatePost is the resolver for the createPost field.
 func (r *mutationResolver) CreatePost(ctx context.Context, input *model.PostInput) (*model.Post, error) {
@@ -74,6 +86,11 @@ func (r *mutationResolver) CreatePost(ctx context.Context, input *model.PostInpu
 // UpdatePost is the resolver for the updatePost field.
 func (r *mutationResolver) UpdatePost(ctx context.Context, id int, input *model.PostInput) (*model.Post, error) {
 	panic(fmt.Errorf("not implemented: UpdatePost - updatePost"))
+}
+
+// Auth is the resolver for the auth field.
+func (r *mutationResolver) Auth(ctx context.Context) (*model.AuthOps, error) {
+	return &model.AuthOps{}, nil
 }
 
 // GetPosts is the resolver for the GetPosts field.
@@ -179,12 +196,27 @@ func (r *queryResolver) GetOnePost(ctx context.Context, id int) (*model.Post, er
 	return Post, nil
 }
 
+// User is the resolver for the user field.
+func (r *queryResolver) User(ctx context.Context, id string) (*model.User, error) {
+	uid, _ := strconv.Atoi(id)
+	return service.GetUserID(ctx, uid)
+}
+
+// Protected is the resolver for the protected field.
+func (r *queryResolver) Protected(ctx context.Context) (string, error) {
+	return "Success", nil
+}
+
+// AuthOps returns AuthOpsResolver implementation.
+func (r *Resolver) AuthOps() AuthOpsResolver { return &authOpsResolver{r} }
+
 // Mutation returns MutationResolver implementation.
 func (r *Resolver) Mutation() MutationResolver { return &mutationResolver{r} }
 
 // Query returns QueryResolver implementation.
 func (r *Resolver) Query() QueryResolver { return &queryResolver{r} }
 
+type authOpsResolver struct{ *Resolver }
 type mutationResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }
 
